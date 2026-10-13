@@ -1,7 +1,10 @@
-function App(){
+ import { AddTask } from "./components/AddTask";
+ 
+ 
+ function App(){
   return (
     <div>
-      <h1>hii there</h1>
+      <AddTask/>
     </div>
   )
 }
