@@ -1,22 +1,50 @@
 import { useState } from "react";
 
-export function AddTask(){
+export function AddTask() {
     const [task, setTask] = useState("");
     const [tasks, setTasks] = useState([]);
+    
+    // States to handle editing
+    const [editIndex, setEditIndex] = useState(null);
+    const [editTask, setEditTask] = useState("");
 
-    function handleSubmit(e){
+    function handleSubmit(e) {
         e.preventDefault();
-        if(!task.trim()) return;
+        if (!task.trim()) return;
 
         setTasks([...tasks, task]);
         setTask("");
     }
 
-    function handleDelete(indexToDelete){
+    function handleDelete(indexToDelete) {
         setTasks(tasks.filter((_, index) => index !== indexToDelete));
+        if (editIndex === indexToDelete) {
+            setEditIndex(null);
+        }
     }
 
-    return(
+    function handleStartEdit(index) {
+        setEditIndex(index);
+        setEditTask(tasks[index]);
+    }
+
+    function handleSaveEdit(indexToSave) {
+        if (!editTask.trim()) return;
+
+        const updatedTasks = tasks.map((item, index) =>
+            index === indexToSave ? editTask : item
+        );
+        setTasks(updatedTasks);
+        setEditIndex(null);
+        setEditTask("");
+    }
+
+    function handleCancelEdit() {
+        setEditIndex(null);
+        setEditTask("");
+    }
+
+    return (
         <div className="min-h-screen bg-slate-950 p-6 text-white">
             <div className="mx-auto max-w-xl">
                 <h1 className="mb-2 text-3xl font-bold">MY Task Manager</h1>
@@ -47,20 +75,55 @@ export function AddTask(){
                         tasks.map((item, index) => (
                             <div 
                                 key={index}
-                                className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-900 p-4"
+                                className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-900 p-4 gap-3"
                             >
-                                <span className="text-slate-200">{item}</span>
-                                <button 
-                                    onClick={() => handleDelete(index)}
-                                    className="rounded-lg bg-red-500 px-3 py-1.5 text-sm font-medium hover:bg-red-400"
-                                >
-                                    Delete
-                                </button>
+                                {editIndex === index ? (
+                                    <>
+                                        <input
+                                            type="text"
+                                            value={editTask}
+                                            onChange={(e) => setEditTask(e.target.value)}
+                                            className="flex-1 rounded-lg border border-slate-700 bg-slate-950 px-3 py-1.5 outline-none focus:border-violet-500 text-slate-200"
+                                        />
+                                        <div className="flex gap-2">
+                                            <button 
+                                                onClick={() => handleSaveEdit(index)}
+                                                className="rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium hover:bg-emerald-500"
+                                            >
+                                                Save
+                                            </button>
+                                            <button 
+                                                onClick={handleCancelEdit}
+                                                className="rounded-lg bg-slate-700 px-3 py-1.5 text-sm font-medium hover:bg-slate-600"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span className="text-slate-200 flex-1">{item}</span>
+                                        <div className="flex gap-2">
+                                            <button 
+                                                onClick={() => handleStartEdit(index)}
+                                                className="rounded-lg bg-amber-600 px-3 py-1.5 text-sm font-medium hover:bg-amber-500"
+                                            >
+                                                Edit
+                                            </button>
+                                            <button 
+                                                onClick={() => handleDelete(index)}
+                                                className="rounded-lg bg-red-500 px-3 py-1.5 text-sm font-medium hover:bg-red-400"
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         ))
                     )}
                 </div>
             </div>
         </div>
-    )
+    );
 }
