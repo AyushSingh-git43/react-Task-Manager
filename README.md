@@ -1,16 +1,45 @@
-# React + Vite
+# ⚡ Task Manager Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, production-grade Task Management web application built with **React**, **Vite**, and **Tailwind CSS**. Designed following clean component architecture principles, this project demonstrates robust client-side state persistence, real-time search and status filtering, and an intuitive responsive dark-themed interface.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🎯 Project Overview
 
-## React Compiler
+This application serves as an interactive task tracking system engineered to simplify daily workflow management. It focuses on clean separation of concerns, utilizing container and presentational component design patterns to ensure state predictability and performance optimization.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## ✨ Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Full CRUD Operations**: Create, read, update (with dynamic inline editing), and delete tasks.
+- **Task Lifecycle Control**: Toggle task completion statuses seamlessly with instant visual feedback (`line-through` indicators and Undo/Done switches).
+- **Real-Time Search**: Instantaneous client-side filtering across all stored tasks.
+- **Categorical Filtering**: Quick-switch tabs for viewing **All**, **Pending**, and **Completed** tasks.
+- **State Persistence**: Automatic synchronization with browser `localStorage` ensuring data retention across page refreshes.
+- **Modern Dark UI**: Engineered with Tailwind CSS for a refined, responsive dark aesthetic.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend**: React (v18+)
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS
+- **State Management**: React Hooks (`useState`, `useEffect`)
+- **Persistence**: Web Storage API (`localStorage`)
+- **Version Control**: Git & GitHub
+
+---
+
+## 🏗️ Architecture & Component Design
+
+```text
+src/
+├── components/
+│   ├── AddTask.jsx        # Container component managing core state & persistence
+│   ├── TaskForm.jsx       # Presentational component for task creation inputs
+│   └── TaskControls.jsx   # Presentational component for search & filter controls
+├── App.jsx                # Root application entry component
+├── main.jsx               # React DOM rendering entry point
+└── index.css              # Global styles & Tailwind CSS directives
