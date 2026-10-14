@@ -8,6 +8,9 @@ export function AddTask() {
     const [editIndex, setEditIndex] = useState(null);
     const [editTask, setEditTask] = useState("");
 
+    // State to handle completed/done tasks
+    const [completedIndexes, setCompletedIndexes] = useState([]);
+
     function handleSubmit(e) {
         e.preventDefault();
         if (!task.trim()) return;
@@ -21,6 +24,8 @@ export function AddTask() {
         if (editIndex === indexToDelete) {
             setEditIndex(null);
         }
+        // Also remove it from completed indexes if it was completed
+        setCompletedIndexes(completedIndexes.filter(i => i !== indexToDelete));
     }
 
     function handleStartEdit(index) {
@@ -42,6 +47,14 @@ export function AddTask() {
     function handleCancelEdit() {
         setEditIndex(null);
         setEditTask("");
+    }
+
+    function handleToggleDone(index) {
+        if (completedIndexes.includes(index)) {
+            setCompletedIndexes(completedIndexes.filter(i => i !== index));
+        } else {
+            setCompletedIndexes([...completedIndexes, index]);
+        }
     }
 
     return (
@@ -102,11 +115,19 @@ export function AddTask() {
                                     </>
                                 ) : (
                                     <>
-                                        <span className="text-slate-200 flex-1">{item}</span>
+                                        <span className={`flex-1 transition-colors ${completedIndexes.includes(index) ? 'line-through text-slate-500' : 'text-slate-250'}`}>
+                                            {item}
+                                        </span>
                                         <div className="flex gap-2">
                                             <button 
+                                                onClick={() => handleToggleDone(index)}
+                                                className={`rounded-lg px-3 py-1.5 text-sm font-medium ${completedIndexes.includes(index) ? 'bg-amber-600 hover:bg-amber-500' : 'bg-emerald-600 hover:bg-emerald-500'}`}
+                                            >
+                                                {completedIndexes.includes(index) ? 'Undo' : 'Done'}
+                                            </button>
+                                            <button 
                                                 onClick={() => handleStartEdit(index)}
-                                                className="rounded-lg bg-amber-600 px-3 py-1.5 text-sm font-medium hover:bg-amber-500"
+                                                className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium hover:bg-blue-400"
                                             >
                                                 Edit
                                             </button>
