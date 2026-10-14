@@ -1,22 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { TaskForm } from "./TaskForm";
+import { TaskControls } from "./TaskControls";
 
 export function AddTask() {
-    const [task, setTask] = useState("");
-    const [tasks, setTasks] = useState([]);
+    const [tasks, setTasks] = useState(() => {
+        const savedTasks = localStorage.getItem("tasks");
+        return savedTasks ? JSON.parse(savedTasks) : [];
+    });
     
-    // States to handle editing
+    const [completedIndexes, setCompletedIndexes] = useState(() => {
+        const savedCompleted = localStorage.getItem("completedIndexes");
+        return savedCompleted ? JSON.parse(savedCompleted) : [];
+    });
+
     const [editIndex, setEditIndex] = useState(null);
     const [editTask, setEditTask] = useState("");
 
-    // State to handle completed/done tasks
-    const [completedIndexes, setCompletedIndexes] = useState([]);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [filterTab, setFilterTab] = useState("all");
 
-    function handleSubmit(e) {
-        e.preventDefault();
-        if (!task.trim()) return;
+    useEffect(() => {
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+    }, [tasks]);
 
-        setTasks([...tasks, task]);
-        setTask("");
+    useEffect(() => {
+        localStorage.setItem("completedIndexes", JSON.stringify(completedIndexes));
+    }, [completedIndexes]);
+
+    function handleAddTask(newTask) {
+        setTasks([...tasks, newTask]);
     }
 
     function handleDelete(indexToDelete) {
@@ -24,8 +36,11 @@ export function AddTask() {
         if (editIndex === indexToDelete) {
             setEditIndex(null);
         }
-        // Also remove it from completed indexes if it was completed
-        setCompletedIndexes(completedIndexes.filter(i => i !== indexToDelete));
+        setCompletedIndexes(
+            completedIndexes
+                .filter(i => i !== indexToDelete)
+                .map(i => (i > indexToDelete ? i - 1 : i))
+        );
     }
 
     function handleStartEdit(index) {
@@ -57,6 +72,15 @@ export function AddTask() {
         }
     }
 
+    const filteredTasks = tasks.map((item, index) => ({ item, index })).filter(({ item, index }) => {
+        const matchesSearch = item.toLowerCase().includes(searchQuery.toLowerCase());
+        const isCompleted = completedIndexes.includes(index);
+
+        if (filterTab === "pending") return matchesSearch && !isCompleted;
+        if (filterTab === "completed") return matchesSearch && isCompleted;
+        return matchesSearch;
+    });
+
     return (
         <div className="min-h-screen bg-slate-950 p-6 text-white">
             <div className="mx-auto max-w-xl">
@@ -65,27 +89,20 @@ export function AddTask() {
                     Organise your day, one task at a time
                 </p>
 
-                <form onSubmit={handleSubmit} className="flex gap-3 mb-6">
-                    <input
-                        type="text"
-                        value={task}
-                        placeholder="Enter your task"
-                        onChange={(e) => setTask(e.target.value)}
-                        className="min-w-0 flex-1 rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 outline-none focus:border-violet-500"
-                    />
-                    <button 
-                        type="submit" 
-                        className="rounded-xl bg-violet-600 px-5 py-3 font-semibold hover:bg-violet-500 whitespace-nowrap"
-                    >
-                        + Add Task
-                    </button>
-                </form>
+                <TaskForm onAddTask={handleAddTask} />
+
+                <TaskControls 
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                    filterTab={filterTab}
+                    setFilterTab={setFilterTab}
+                />
 
                 <div className="space-y-4">
-                    {tasks.length === 0 ? (
-                        <p className="text-sm text-slate-500 text-center py-6">No Task Yet</p>
+                    {filteredTasks.length === 0 ? (
+                        <p className="text-sm text-slate-500 text-center py-6">No Tasks Found</p>
                     ) : (
-                        tasks.map((item, index) => (
+                        filteredTasks.map(({ item, index }) => (
                             <div 
                                 key={index}
                                 className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-900 p-4 gap-3"
@@ -115,7 +132,7 @@ export function AddTask() {
                                     </>
                                 ) : (
                                     <>
-                                        <span className={`flex-1 transition-colors ${completedIndexes.includes(index) ? 'line-through text-slate-500' : 'text-slate-250'}`}>
+                                        <span className={`flex-1 transition-colors ${completedIndexes.includes(index) ? 'line-through text-slate-500' : 'text-slate-200'}`}>
                                             {item}
                                         </span>
                                         <div className="flex gap-2">
